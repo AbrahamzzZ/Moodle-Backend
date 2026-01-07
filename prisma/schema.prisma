@@ -1,0 +1,115 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Rol {
+  ESTUDIANTE
+  DOCENTE
+}
+
+enum TipoActividad {
+  TAREA
+  FORO
+  RECURSO
+}
+
+enum EstadoActividad {
+  PENDIENTE
+  ENTREGADO
+}
+
+model Usuario {
+  id             String   @id @default(uuid())
+  nombre         String
+  email          String   @unique
+  rol            Rol
+  tokenMoodle    String
+  tokenOAuth     String
+  activo         Boolean  @default(true)
+
+  entregas       EntregaTarea[]
+  mensajes       MensajeForo[]
+  notificaciones Notificacion[]
+}
+
+model Curso {
+  id           Int    @id
+  nombre       String
+  shortName    String
+  docente      String
+  resumen      String
+
+  actividades  Actividad[]
+  foros        Foro[]
+}
+
+model Actividad {
+  id            Int      @id
+  cursoId       Int
+  nombre        String
+  tipo          TipoActividad
+  fechaInicio   DateTime
+  fechaEntrega  DateTime?
+  estado        EstadoActividad
+
+  curso         Curso    @relation(fields: [cursoId], references: [id])
+  tarea         Tarea?
+}
+
+model Tarea {
+  id              Int     @id
+  actividadId     Int     @unique
+  descripcion     String
+  permiteArchivo  Boolean
+
+  actividad       Actividad @relation(fields: [actividadId], references: [id])
+  entregas        EntregaTarea[]
+}
+
+model EntregaTarea {
+  id            Int      @id @default(autoincrement())
+  tareaId       Int
+  usuarioId     String
+  texto         String
+  archivoUrl    String?
+  fechaEntrega  DateTime
+
+  tarea         Tarea    @relation(fields: [tareaId], references: [id])
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model Foro {
+  id        Int    @id
+  cursoId   Int
+  nombre    String
+
+  curso     Curso @relation(fields: [cursoId], references: [id])
+  mensajes  MensajeForo[]
+}
+
+model MensajeForo {
+  id        Int      @id @default(autoincrement())
+  foroId    Int
+  usuarioId String
+  mensaje   String
+  fecha     DateTime @default(now())
+
+  foro      Foro     @relation(fields: [foroId], references: [id])
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model Notificacion {
+  id        String   @id @default(uuid())
+  usuarioId String
+  titulo    String
+  mensaje   String
+  leido     Boolean  @default(false)
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
