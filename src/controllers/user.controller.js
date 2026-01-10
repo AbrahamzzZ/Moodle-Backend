@@ -1,11 +1,11 @@
-const userService = require('../services/user.service');
+import * as userService from '../services/user.service.js';
 
-async function createUser(req, res) {
+export async function createUser(req, res) {
   try {
     const { nombre, email, rol } = req.body;
 
     let user = await userService.findByEmail(email);
-
+    
     if (!user) {
       user = await userService.createUser({
         nombre,
@@ -23,7 +23,3 @@ async function createUser(req, res) {
     res.status(500).json({ message: 'Error creando usuario' });
   }
 }
-
-module.exports = {
-  createUser
-};

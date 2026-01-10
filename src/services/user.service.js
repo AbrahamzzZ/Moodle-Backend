@@ -1,18 +1,13 @@
-const prisma = require('../prismaClient');
+import prisma from '../prismaClient.js';
 
-async function findByEmail(email) {
+export async function findByEmail(email) {
   return prisma.usuario.findUnique({
     where: { email }
   });
 }
 
-async function createUser(data) {
+export async function createUser(data) {
   return prisma.usuario.create({
     data
   });
 }
-
-module.exports = {
-  findByEmail,
-  createUser
-};
