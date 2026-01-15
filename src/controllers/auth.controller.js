@@ -4,36 +4,38 @@ const MOODLE_URL = process.env.MOODLE_URL;
 const MOODLE_TOKEN = process.env.MOODLE_TOKEN;
 
 export async function loginWithGoogle(req, res) {
-  const { email, name } = req.body;
-
-  if (!email) {
-    return res.status(400).json({
-      ok: false,
-      message: "Email requerido",
-    });
-  }
-
   try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ ok: false, message: 'Token requerido' });
+    }
+
+    const idToken = authHeader.replace('Bearer ', '');
+    const { data: googleUser } = await axios.get(
+      'https://oauth2.googleapis.com/tokeninfo',
+      { params: { id_token: idToken } }
+    );
+
+    const email = googleUser.email;
     const response = await axios.get(MOODLE_URL, {
       params: {
         wstoken: MOODLE_TOKEN,
-        wsfunction: "core_user_get_users_by_field",
-        moodlewsrestformat: "json",
-        field: "email",
-        "values[0]": email,
+        wsfunction: 'core_user_get_users_by_field',
+        moodlewsrestformat: 'json',
+        field: 'email',
+        'values[0]': email,
       },
     });
 
-    const users = response.data;
-
-    if (!users || users.length === 0) {
+    if (!response.data || response.data.length === 0) {
       return res.status(401).json({
         ok: false,
-        message: "El usuario no existe en Moodle",
+        message: 'Usuario no existe en Moodle',
       });
     }
 
-    const moodleUser = users[0];
+    const moodleUser = response.data[0];
 
     return res.json({
       ok: true,
@@ -41,16 +43,15 @@ export async function loginWithGoogle(req, res) {
         id: moodleUser.id,
         fullname: `${moodleUser.firstname} ${moodleUser.lastname}`,
         email: moodleUser.email,
-        role: moodleUser.role || "estudiante",
       },
     });
 
   } catch (error) {
-    console.error("Error Moodle Auth:", error.message);
+    console.error('Auth error:', error.response?.data || error.message);
 
-    res.status(500).json({
+    return res.status(401).json({
       ok: false,
-      message: "Error al validar usuario en Moodle",
+      message: 'Token inválido o expirado',
     });
   }
 }
