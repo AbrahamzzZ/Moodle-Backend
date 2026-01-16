@@ -1,7 +1,10 @@
 import axios from "axios";
+import jwt from "jsonwebtoken";
 
 const MOODLE_URL = process.env.MOODLE_URL;
 const MOODLE_TOKEN = process.env.MOODLE_TOKEN;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
 export async function loginWithGoogle(req, res) {
   try {
@@ -36,9 +39,18 @@ export async function loginWithGoogle(req, res) {
     }
 
     const moodleUser = response.data[0];
+    const appToken = jwt.sign(
+      {
+        id: moodleUser.id,
+        email: moodleUser.email,
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES }
+    );
 
     return res.json({
       ok: true,
+      token: appToken,
       user: {
         id: moodleUser.id,
         fullname: `${moodleUser.firstname} ${moodleUser.lastname}`,
