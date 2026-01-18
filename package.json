@@ -15,10 +15,12 @@
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "expo-server-sdk": "^4.0.0",
     "express": "^5.2.1",
     "express-session": "^1.18.2",
     "firebase-admin": "^13.6.0",
     "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.16.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
   },
