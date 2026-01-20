@@ -20,11 +20,16 @@ export async function registerToken(req, res) {
   }
 }
 
-export async function sendToUser(req, res) {
+export async function sendLogoutNotification(req, res) {
   try {
-    const { userId, title, body } = req.body;
+    const userId = req.user.id;
 
-    await sendPushToUser(userId, title, body);
+    await sendPushToUser(
+      userId,
+      'Sesión cerrada',
+      'Has cerrado sesión correctamente',
+      { action: 'LOGOUT' }
+    );
 
     res.json({ ok: true });
   } catch (error) {
