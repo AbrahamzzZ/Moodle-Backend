@@ -22,7 +22,7 @@ export async function registerPushToken(userId, pushToken, platform) {
   return true;
 }
 
-export async function sendPushToUser(userId, title, body) {
+export async function sendPushToUser(userId, title, body, data = {}) {
   const [rows] = await pool.query(
     'SELECT push_token FROM mdl_user_push_tokens WHERE userid = ?',
     [userId]
@@ -37,6 +37,7 @@ export async function sendPushToUser(userId, title, body) {
     sound: 'default',
     title,
     body,
+    data,
   };
 
   await expo.sendPushNotificationsAsync([message]);
