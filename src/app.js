@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import authRoutes from './routes/auth.routes.js';
-import coursesRoutes from './routes/moodle.route.js';
+import coursesRoutes from './routes/course.route.js';
 import notificationRoutes from './routes/notification.route.js';
 
 const app = express();
