@@ -28,7 +28,6 @@ Ejecute el siguiente comando para instalar las dependencias necesarias:
 
 Cree un archivo .env en la raíz del proyecto y configure las siguientes variables:
 
-    GOOGLE_CLIENT_SECRET=xxxxxxxxx
     MOODLE_URL=xxxxxxx
     MOODLE_TOKEN=xxxxxxxx
     JWT_SECRET=xxxxxxx
