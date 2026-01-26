@@ -5,12 +5,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export default function authMiddleware(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
-      return res.status(401).json({
-        ok: false,
-        message: 'Token requerido',
-      });
+      return res.status(401).json({ ok: false, message: 'Token requerido' });
     }
 
     const token = authHeader.replace('Bearer ', '');
@@ -19,12 +15,10 @@ export default function authMiddleware(req, res, next) {
     req.user = {
       id: decoded.id,
       email: decoded.email,
-      moodleToken: decoded.moodleToken,
     };
 
     next();
   } catch (error) {
-    console.log(error);
     return res.status(401).json({
       ok: false,
       message: 'Token inválido o expirado',
