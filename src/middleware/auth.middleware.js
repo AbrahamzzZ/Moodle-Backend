@@ -19,6 +19,7 @@ export default function authMiddleware(req, res, next) {
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      moodleToken: decoded.moodleToken,
     };
 
     next();

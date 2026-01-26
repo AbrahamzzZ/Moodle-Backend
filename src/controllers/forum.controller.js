@@ -1,8 +1,8 @@
 import {
   fetchForums,
-  addDiscussion,
-  replyToPost,
-  fetchForumDiscussions
+  fetchForumDiscussions,
+  fetchDiscussionPosts,
+  replyToPost
 } from '../services/forum.service.js';
 
 export async function getForumsByCourses(req, res) {
@@ -53,33 +53,59 @@ export async function getForumDiscussions(req, res) {
   }
 }
 
-export async function createForumDiscussion(req, res) {
+export async function getDiscussionPosts(req, res) {
   try {
-    const { forumId, subject, message } = req.body;
+    const { discussionId } = req.params;
 
-    const discussion = await addDiscussion(
-      req.user,
-      forumId,
-      subject,
-      message
-    );
+    if (!discussionId) {
+      return res.status(400).json({
+        ok: false,
+        message: 'discussionId es requerido',
+      });
+    }
 
-    res.json({ ok: true, discussion });
+    const posts = await fetchDiscussionPosts(Number(discussionId));
+
+    res.json({
+      ok: true,
+      posts,
+    });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ ok: false, message: error.message });
+    res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
   }
 }
 
-export async function replyForumPost(req, res) {
+export async function postReplyForum(req, res) {
   try {
     const { postId, message } = req.body;
+    console.log(postId, message);
+    if (!postId || !message) {
+      return res.status(400).json({
+        ok: false,
+        message: 'postId y message son requeridos',
+      });
+    }
 
-    const reply = await replyToPost(req.user, postId, message);
+    const token = req.user.moodleToken;
+    console.log(token);
+
+    if (!token) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Usuario no tiene token de Moodle asignado',
+      });
+    }
+
+    const reply = await replyToPost({ postId, message, token });
+    console.log(reply);
 
     res.json({ ok: true, reply });
   } catch (error) {
-    console.error(error);
+    console.error('Error postReplyForum:', error);
     res.status(400).json({ ok: false, message: error.message });
   }
 }
