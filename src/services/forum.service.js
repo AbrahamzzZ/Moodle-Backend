@@ -38,6 +38,14 @@ export async function replyToPost({ postId, message, token }) {
   });
 }
 
+export async function userHasReplied(discussionId, userId) {
+  const postsData = await fetchDiscussionPosts(discussionId);
+  const posts = postsData.posts || [];
+
+  return posts.some(
+    post => post.author?.id === userId && post.parentid !== null
+  );
+}
 /*export async function replyToPost({ postId, message, token }) {
   if (!token) {
     throw new Error('Token de Moodle requerido');
