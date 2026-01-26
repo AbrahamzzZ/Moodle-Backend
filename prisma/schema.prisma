@@ -4,16 +4,12 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-model ForumReminder {
-  id            Int      @id @default(autoincrement())
-  userId        Int
-  discussionId  Int
-  forumId       Int
-  notified      Boolean  @default(false)
-  replied       Boolean  @default(false)
-  lastChecked   DateTime @default(now())
-
-  @@unique([userId, discussionId])
+model UserPushToken {
+  id        Int    @id @default(autoincrement())
+  userId    Int    @unique
+  pushToken String
+  platform  String
 }
