@@ -2,12 +2,15 @@ import axios from 'axios';
 import qs from 'qs';
 
 export async function callMoodleApi({
-  token,
   wsfunction,
   params = {},
   method = 'GET',
 }) {
-  if (!token) throw new Error('Token Moodle requerido');
+  const token = process.env.MOODLE_API_TOKEN;
+
+  if (!token) {
+    throw new Error('Token Moodle no configurado');
+  }
 
   const payload = {
     wstoken: token,
@@ -40,3 +43,4 @@ export async function callMoodleApi({
 
   return response.data;
 }
+
