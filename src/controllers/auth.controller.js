@@ -39,10 +39,12 @@ export async function loginWithGoogle(req, res) {
     }
 
     const moodleUser = response.data[0];
+    const moodleToken = getMoodleTokenForUser(moodleUser.id);
     const appToken = jwt.sign(
       {
         id: moodleUser.id,
         email: moodleUser.email,
+        moodleToken,
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES }
@@ -66,4 +68,13 @@ export async function loginWithGoogle(req, res) {
       message: 'Token inválido o expirado',
     });
   }
+}
+
+function getMoodleTokenForUser(userId) {
+  const tokens = {
+    1: process.env.MOODLE_TOKEN,    // admin
+    2: process.env.MOODLE_TOKEN_2,  // docente
+    5: process.env.MOODLE_TOKEN_3,  // estudiante
+  };
+  return tokens[userId] || process.env.MOODLE_TOKEN;
 }
