@@ -24,7 +24,7 @@ export async function listCourses(req, res) {
   } catch (err) {
     res.status(500).json({
       ok: false,
-      message: "Error al obtener cursos",
+      message: "Error al obtener cursos", err
     });
   }
 }
@@ -41,7 +41,7 @@ export async function getCourseDetailController(req, res) {
   } catch (error) {
     res.status(500).json({
       ok: false,
-      message: "Error al obtener contenido del curso",
+      message: "Error al obtener contenido del curso", err
     });
   }
 }

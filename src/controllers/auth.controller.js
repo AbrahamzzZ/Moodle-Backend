@@ -2,7 +2,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
+const JWT_EXPIRES = process.env.JWT_EXPIRES;
 const MOODLE_URL = process.env.MOODLE_URL;
 const MOODLE_API_TOKEN = process.env.MOODLE_API_TOKEN;
 
@@ -14,7 +14,6 @@ export async function loginWithGoogle(req, res) {
     }
 
     const idToken = authHeader.replace('Bearer ', '');
-
     const { data: googleUser } = await axios.get(
       'https://oauth2.googleapis.com/tokeninfo',
       { params: { id_token: idToken } }
