@@ -83,6 +83,7 @@ export async function getDiscussionPosts(req, res) {
 export async function postReplyForum(req, res) {
   try {
     const { postId, message } = req.body;
+
     if (!postId || !message) {
       return res.status(400).json({
         ok: false,
@@ -90,16 +91,8 @@ export async function postReplyForum(req, res) {
       });
     }
 
-    const token = req.user.moodleToken;
-
-    if (!token) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Usuario no tiene token de Moodle asignado',
-      });
-    }
-
-    const reply = await replyToPost({ postId, message, token });
+    const reply = await replyToPost({ postId, message });
+    console.log(reply.message);
 
     res.json({ ok: true, reply });
   } catch (error) {
