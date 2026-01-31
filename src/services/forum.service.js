@@ -25,15 +25,14 @@ export async function fetchDiscussionPosts(discussionId) {
   });
 }
 
-export async function replyToPost({ postId, message, token }) {
+export async function replyToPost({ postId, message }) {
   return callMoodleApi({
-    token,
     wsfunction: 'mod_forum_add_discussion_post',
     method: 'POST',
     params: {
       postid: Number(postId),
       message: message.replace(/<[^>]*>/g, ''),
-      messageformat: 0, 
+      messageformat: 0,
     },
   });
 }
@@ -46,19 +45,3 @@ export async function userHasReplied(discussionId, userId) {
     post => post.author?.id === userId && post.parentid !== null
   );
 }
-/*export async function replyToPost({ postId, message, token }) {
-  if (!token) {
-    throw new Error('Token de Moodle requerido');
-  }
-
-  return callMoodleApi({
-    token,
-    wsfunction: 'mod_forum_add_discussion_post',
-    method: 'POST',
-    params: {
-      postid: postId,
-      message,
-      messageformat: 1,
-    },
-  });
-}*/

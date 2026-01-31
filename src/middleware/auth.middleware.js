@@ -22,6 +22,7 @@ export default function authMiddleware(req, res, next) {
     return res.status(401).json({
       ok: false,
       message: 'Token inválido o expirado',
+      error
     });
   }
 }
