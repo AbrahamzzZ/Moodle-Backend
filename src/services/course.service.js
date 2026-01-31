@@ -12,7 +12,6 @@ export async function getUserCourses(userId) {
   };
 
   const response = await axios.get(MOODLE, { params });
-
   return response.data;
 }
 
@@ -69,16 +68,64 @@ export async function getMappedCourseDetail(courseId) {
 
   const { data } = await axios.get(MOODLE, { params });
 
-  return data.map(section => ({
-    id: section.id,
-    title: section.name,
-    summary: section.summary,
-    modules: section.modules.map(m => ({
-      id: m.id,
-      name: m.name,
-      type: m.modname, 
-      url: m.url,
-      visible: m.visible
-    }))
-  }));
+  return data
+    .filter(section => section.visible !== 0)
+    .map(section => ({
+      id: section.id,
+      title: section.name,
+      summary: section.summary,
+      modules: section.modules
+        .filter(module => module.visible !== 0)
+        .map(module => {
+          const base = {
+            id: module.id,
+            name: module.name,
+            type: module.modname, 
+            url: module.url || null
+          };
+
+          if (module.modname === "resource" && module.contents?.length) {
+            return {
+              ...base,
+              files: module.contents.map(file => ({
+                filename: file.filename,
+                mimetype: file.mimetype,
+                filesize: file.filesize,
+                downloadUrl: `${file.fileurl}?token=${TOKEN}`
+              }))
+            };
+          }
+
+          if (module.modname === "url") {
+            return {
+              ...base,
+              externalUrl: module.contents?.[0]?.fileurl || module.url
+            };
+          }
+
+          if (module.modname === "forum") {
+            return {
+              ...base,
+              activityType: "forum"
+            };
+          }
+
+          if (module.modname === "assign") {
+            return {
+              ...base,
+              activityType: "assignment"
+            };
+          }
+
+          if (module.modname === "label") {
+            return {
+              ...base,
+              description: module.description
+            };
+          }
+
+          return base;
+        })
+    }));
 }
+
