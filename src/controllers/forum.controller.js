@@ -90,11 +90,7 @@ export async function postReplyForum(req, res) {
       });
     }
 
-    console.log(postId, message);
-
     const reply = await replyToPost({ postId, message });
-    console.log(reply);
-
     res.json({ ok: true, reply });
   } catch (error) {
     console.error('Error postReplyForum:', error);

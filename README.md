@@ -40,15 +40,18 @@ Este token permitirá al backend consumir los servicios REST de Moodle.
 
 # Base de datos (SQLite + Prisma)
 
-Este proyecto utiliza SQLite junto con Prisma ORM para almacenar información local, como los tokens de notificaciones push.
+Este proyecto utiliza SQLite junto con Prisma ORM para almacenar información local, como los tokens de notificaciones push. 
 
-1. Inicializar la base de datos:
-- npx prisma generate
+1. Instalar Prisma. Si ya lo tienes instalado continuar con el paso 2.
+- npm install prisma@6 --save-dev
 
-2. Crear la base de datos y aplicar migraciones:
+2. Inicializar la base de datos:
+- npx prisma generate version 6
+
+3. Crear la base de datos y aplicar migraciones:
 - npx prisma migrate dev
 
-3. El archivo de base de datos se creará automáticamente en:
+4. El archivo de base de datos se creará automáticamente en:
 - prisma/notifications.db
 
 Generar el cliente de Prisma:
