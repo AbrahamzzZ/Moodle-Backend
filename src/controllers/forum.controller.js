@@ -4,7 +4,6 @@ import {
   fetchDiscussionPosts,
   replyToPost
 } from '../services/forum.service.js';
-import prisma from '../prisma/client.js';
 
 export async function getForumsByCourses(req, res) {
   try {
@@ -91,46 +90,14 @@ export async function postReplyForum(req, res) {
       });
     }
 
+    console.log(postId, message);
+
     const reply = await replyToPost({ postId, message });
-    console.log(reply.message);
+    console.log(reply);
 
     res.json({ ok: true, reply });
   } catch (error) {
     console.error('Error postReplyForum:', error);
-    res.status(400).json({ ok: false, message: error.message });
-  }
-}
-
-export async function createForumReminder(req, res) {
-  try {
-    const userId = req.user.id;
-    const { discussionId, forumId } = req.body;
-
-    if (!discussionId || !forumId) {
-      return res.status(400).json({
-        ok: false,
-        message: 'discussionId y forumId son requeridos',
-      });
-    }
-
-    await prisma.forumReminder.upsert({
-      where: {
-        userId_discussionId: {
-          userId,
-          discussionId,
-        },
-      },
-      update: {},
-      create: {
-        userId,
-        discussionId,
-        forumId,
-      },
-    });
-
-    res.json({ ok: true });
-  } catch (error) {
-    console.error(error);
     res.status(400).json({ ok: false, message: error.message });
   }
 }
