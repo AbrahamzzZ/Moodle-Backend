@@ -27,21 +27,14 @@ export async function fetchDiscussionPosts(discussionId) {
 
 export async function replyToPost({ postId, message }) {
   return callMoodleApi({
+    token: MOODLE_TOKENS.admin,
     wsfunction: 'mod_forum_add_discussion_post',
     method: 'POST',
     params: {
       postid: Number(postId),
-      message: message.replace(/<[^>]*>/g, ''),
-      messageformat: 0,
+      subject: 'Re: Respuesta',        
+      message: `<p>${message}</p>`,     
+      messageformat: 1,       
     },
   });
-}
-
-export async function userHasReplied(discussionId, userId) {
-  const postsData = await fetchDiscussionPosts(discussionId);
-  const posts = postsData.posts || [];
-
-  return posts.some(
-    post => post.author?.id === userId && post.parentid !== null
-  );
 }
