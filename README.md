@@ -1,6 +1,7 @@
 # Moodle Backend API
 
 Backend desarrollado en Node.js + Express para la integración con Moodle, autenticación con Google y consumo de servicios REST.
+Incluye persistencia con SQLite + Prisma para almacenar tokens de notificaciones push.
 
 # Requisitos previos
 
@@ -24,13 +25,41 @@ Ejecute el siguiente comando para instalar las dependencias necesarias:
 
 - npm install
 
+# Creación de tokens en el Moodle
+
+Debe crearse un token de Web Service en Moodle.
+El mismo token puede utilizarse para los tres tipos de usuarios:
+
+   - Administrador
+
+   - Docente
+
+   - Estudiante
+
+Este token permitirá al backend consumir los servicios REST de Moodle.
+
+# Base de datos (SQLite + Prisma)
+
+Este proyecto utiliza SQLite junto con Prisma ORM para almacenar información local, como los tokens de notificaciones push.
+
+1. Inicializar la base de datos:
+- npx prisma generate
+
+2. Crear la base de datos y aplicar migraciones:
+- npx prisma migrate dev
+
+3. El archivo de base de datos se creará automáticamente en:
+- prisma/notifications.db
+
+Generar el cliente de Prisma:
+
 # Variables de entorno
 
 Cree un archivo .env en la raíz del proyecto y configure las siguientes variables:
 
-    GOOGLE_CLIENT_SECRET=xxxxxxxxx
+    DATABASE_URL="file:./notifications.db"
     MOODLE_URL=xxxxxxx
-    MOODLE_TOKEN=xxxxxxxx
+    MOODLE_API_TOKEN=xxxxxxxx
     JWT_SECRET=xxxxxxx
     JWT_EXPIRES=xxxxxxx
 
