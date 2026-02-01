@@ -4,7 +4,6 @@ import {
   fetchDiscussionPosts,
   replyToPost
 } from '../services/forum.service.js';
-import prisma from '../prisma/client.js';
 
 export async function getForumsByCourses(req, res) {
   try {
