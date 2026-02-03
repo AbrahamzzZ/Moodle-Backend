@@ -38,6 +38,47 @@ El mismo token puede utilizarse para los tres tipos de usuarios:
 
 Este token permitirá al backend consumir los servicios REST de Moodle.
 
+# Funciones y Capacidades del servicio web de Moodle
+
+Se debe tener estas funciones para que la aplicacion funcione:
+
+- core_course_create_courses
+- core_course_get_contents
+- core_course_get_courses
+- core_course_get_enrolled_courses_by_timeline_classification
+- core_enrol_get_users_courses
+- core_user_get_users
+- core_user_get_users_by_field
+- mod_assign_get_assignments
+- mod_assign_save_submission
+- mod_forum_add_discussion
+- mod_forum_add_discussion_post
+- mod_forum_get_discussion_posts
+- mod_forum_get_forums_by_courses
+- mod_forum_get_forum_discussions
+- mod_forum_get_forums_by_courses
+- mod_forum_get_forum_discussions
+- mod_forum_get_discussion_posts
+- mod_assign_get_assignments
+- mod_assign_get_submission_status
+- mod_assign_save_submission
+- mod_assign_submit_for_grading
+- core_files_upload
+- mod_assign_save_submission
+
+Se debe tener estas capacidades para que la aplicación funcione:
+
+- moodle/webservice:createtoken
+- moodle/user:viewalldetails
+- moodle/course:enrolreview
+- moodle/course:view
+- moodle/course:viewparticipants
+- moodle/user:viewdetails
+- webservice/rest:use
+- mod/forum:replypost
+- mod/forum:startdiscussion
+- moodle/site:trustcontent
+
 # Base de datos (SQLite + Prisma)
 
 Este proyecto utiliza SQLite junto con Prisma ORM para almacenar información local, como los tokens de notificaciones push. 
