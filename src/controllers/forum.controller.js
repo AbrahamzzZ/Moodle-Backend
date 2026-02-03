@@ -64,17 +64,26 @@ export async function getDiscussionPosts(req, res) {
       });
     }
 
-    const posts = await fetchDiscussionPosts(Number(discussionId));
+    const response = await fetchDiscussionPosts(Number(discussionId));
+    if (!response || !response.posts || response.posts.length === 0) {
+      return res.json({
+        ok: true,
+        posts: [],
+      });
+    }
 
-    res.json({
+    return res.json({
       ok: true,
-      posts,
+      posts: response.posts,
     });
+
   } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      ok: false,
-      message: error.message,
+    console.error('getDiscussionPosts warning:', error.message);
+
+    return res.json({
+      ok: true,
+      posts: [],
+      warning: 'Discusión sin respuestas',
     });
   }
 }

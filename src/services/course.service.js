@@ -59,6 +59,7 @@ export async function getMappedCourseDetail(courseId) {
         .map(module => {
           const base = {
             id: module.id,
+            instance: module.instance,
             name: module.name,
             type: module.modname,
             url: module.url || null,
