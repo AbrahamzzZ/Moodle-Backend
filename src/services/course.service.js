@@ -20,7 +20,6 @@ export async function getCourseTeacher(courseId) {
         courseid: courseId,
       },
     });
-    console.log(users);
 
     const teacher = users.find(user =>
       user.roles?.some(
@@ -29,8 +28,6 @@ export async function getCourseTeacher(courseId) {
           role.shortname === 'teacher'
       )
     );
-
-    console.log(teacher);
 
     return teacher ? teacher.fullname : 'No disponible';
   } catch (error) {
@@ -68,12 +65,8 @@ export async function getMappedCourseDetail(courseId) {
           if (module.modname === 'resource' && module.contents?.length) {
             return {
               ...base,
-              files: module.contents.map(file => ({
-                filename: file.filename,
-                mimetype: file.mimetype,
-                filesize: file.filesize,
-                downloadUrl: `${file.fileurl}?token=${MOODLE_TOKENS.admin}`,
-              })),
+              hasFiles: true,
+              fileCount: module.contents.length,
             };
           }
 
