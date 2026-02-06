@@ -7,6 +7,7 @@ export async function registerPushToken(userId, pushToken, platform) {
   if (!Expo.isExpoPushToken(pushToken)) {
     throw new Error('Push token inválido');
   }
+  console.log(pushToken);
 
   await prisma.userPushToken.upsert({
     where: { userId },
@@ -20,6 +21,8 @@ export async function sendForumReminder(userId, title, body) {
     where: { userId },
   });
 
+  console.log('TOKENS:', tokens);
+
   if (!tokens.length) return;
 
   const messages = tokens.map(t => ({
@@ -29,5 +32,8 @@ export async function sendForumReminder(userId, title, body) {
     body,
   }));
 
-  await expo.sendPushNotificationsAsync(messages);
+  console.log('MENSAJES PUSH:', messages);
+
+  const result = await expo.sendPushNotificationsAsync(messages);
+  console.log('RESULTADO EXPO:', result);
 }
