@@ -8,6 +8,7 @@ datasource db {
 }
 
 model UserPushToken {
+<<<<<<< Updated upstream
   id        Int    @id @default(autoincrement())
   userId    Int    @unique
   pushToken String
@@ -28,4 +29,11 @@ model ForumReplyStatus {
   notifiedAt    DateTime?
 
   @@unique([userId, discussionId])
+=======
+  id          Int     @id @default(autoincrement())
+  userId      Int     @unique
+  pushToken   String
+  platform    String
+  moodleToken String?
+>>>>>>> Stashed changes
 }

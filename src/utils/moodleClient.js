@@ -21,14 +21,15 @@ export async function callMoodleApi({
   let response;
 
   if (method === 'POST') {
+
     response = await axios.post(
       process.env.MOODLE_URL,
-      qs.stringify(payload),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
+      qs.stringify(payload, { encode: true, arrayFormat: 'indices' }),
+  {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  }
     );
   } else {
     response = await axios.get(process.env.MOODLE_URL, {
@@ -37,8 +38,11 @@ export async function callMoodleApi({
   }
 
   if (response.data?.exception) {
-    throw new Error(response.data.message);
+    const { message, errorcode, debuginfo } = response.data;
+    throw new Error(
+      `[${errorcode}] ${message}${debuginfo ? ` | ${debuginfo}` : ''}`
+    );
   }
 
-  return response.data;
+  return response.data ?? { ok: true };
 }

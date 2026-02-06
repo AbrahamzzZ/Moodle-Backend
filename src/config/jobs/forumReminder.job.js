@@ -1,9 +1,13 @@
 import prisma from '../../prisma/client.js';
+<<<<<<< Updated upstream
 import {
   fetchForums,
   fetchForumDiscussions,
 } from '../../services/forum.service.js';
 import { getUserCourses } from '../../services/course.service.js';
+=======
+import { userHasReplied } from '../../services/forum.service.js';
+>>>>>>> Stashed changes
 import { sendForumReminder } from '../../services/notification.service.js';
 
 export async function runForumReminderJob() {

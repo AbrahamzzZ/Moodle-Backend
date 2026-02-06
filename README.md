@@ -114,3 +114,5 @@ Para iniciar el backend en modo desarrollo, ejecute:
 - npm run dev
 
 El servidor se levantará en: http://localhost:3000
+
+

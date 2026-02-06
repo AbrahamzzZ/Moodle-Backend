@@ -12,7 +12,6 @@ export async function listCourses(req, res) {
     const formattedCourses = await Promise.all(
       courses.map(async course => {
         const teacher = await getCourseTeacher(course.id);
-        console.log(teacher);
         const sections = await getMappedCourseDetail(course.id);
 
         return {
