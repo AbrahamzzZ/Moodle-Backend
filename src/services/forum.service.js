@@ -25,16 +25,16 @@ export async function fetchDiscussionPosts(discussionId) {
   });
 }
 
-export async function replyToPost({ postId, message }) {
+export async function replyToPost({ postId, message, userToken }) {
   return callMoodleApi({
     token: MOODLE_TOKENS.admin,
     wsfunction: 'mod_forum_add_discussion_post',
     method: 'POST',
     params: {
       postid: Number(postId),
-      subject: 'Re: Respuesta',        
-      message: `<p>${message}</p>`,     
-      messageformat: 1,       
+      subject: 'Re: Respuesta',
+      message: `<p>${message}</p>`,
+      messageformat: 1,
     },
   });
 }
