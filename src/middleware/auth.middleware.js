@@ -1,12 +1,15 @@
 import jwt from 'jsonwebtoken';
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export default function authMiddleware(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ ok: false, message: 'Token requerido' });
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        ok: false,
+        message: 'Token requerido',
+      });
     }
 
     const token = authHeader.replace('Bearer ', '');
@@ -15,14 +18,14 @@ export default function authMiddleware(req, res, next) {
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      fullname: decoded.fullname,
     };
 
     next();
   } catch (error) {
     return res.status(401).json({
       ok: false,
-      message: 'Token inválido o expirado',
-      error
+      message: 'Token inválido o expirado', error
     });
   }
 }

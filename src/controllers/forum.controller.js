@@ -1,9 +1,11 @@
+import { MOODLE_TOKENS } from '../config/moodleTokens.js';
 import {
   fetchForums,
   fetchForumDiscussions,
   fetchDiscussionPosts,
   replyToPost
 } from '../services/forum.service.js';
+import { getUserRoleByCourse } from '../services/auth.service.js';
 
 export async function getForumsByCourses(req, res) {
   try {
@@ -90,19 +92,37 @@ export async function getDiscussionPosts(req, res) {
 
 export async function postReplyForum(req, res) {
   try {
-    const { postId, message } = req.body;
+    const { postId, message, courseId } = req.body;
+    const { id: userId, moodleToken } = req.user;
 
-    if (!postId || !message) {
+    if (!postId || !message || !courseId) {
       return res.status(400).json({
         ok: false,
-        message: 'postId y message son requeridos',
+        message: 'postId, message y courseId son requeridos',
       });
     }
 
-    const reply = await replyToPost({ postId, message });
+    const role = await getUserRoleByCourse({ userId, courseId });
+
+    if (!role) {
+      return res.status(403).json({
+        ok: false,
+        message: 'Usuario no matriculado en el curso',
+      });
+    }
+
+    const reply = await replyToPost({
+      postId,
+      message,
+      userToken: moodleToken, 
+    });
+
     res.json({ ok: true, reply });
   } catch (error) {
     console.error('Error postReplyForum:', error);
-    res.status(400).json({ ok: false, message: error.message });
+    res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
   }
 }

@@ -13,3 +13,19 @@ model UserPushToken {
   pushToken String
   platform  String
 }
+
+model ForumReplyStatus {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  courseId      Int
+  forumId       Int
+  discussionId  Int
+
+  replied       Boolean   @default(false)
+  repliedAt     DateTime?
+
+  notified      Boolean   @default(false)
+  notifiedAt    DateTime?
+
+  @@unique([userId, discussionId])
+}

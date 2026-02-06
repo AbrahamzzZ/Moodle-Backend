@@ -1,38 +1,120 @@
 import prisma from '../../prisma/client.js';
-import { userHasReplied } from '../services/forum.service.js';
-import { sendForumReminder } from '../services/notification.service.js';
+import {
+  fetchForums,
+  fetchForumDiscussions,
+} from '../../services/forum.service.js';
+import { getUserCourses } from '../../services/course.service.js';
+import { sendForumReminder } from '../../services/notification.service.js';
 
 export async function runForumReminderJob() {
-  const reminders = await prisma.forumReminder.findMany({
-    where: {
-      replied: false,
-      notified: false,
-    },
+  console.log('Ejecutando job de recordatorios');
+
+  const now = Math.floor(Date.now() / 1000);
+  const REMINDER_WINDOW = 2 * 60;
+
+  const usersWithToken = await prisma.userPushToken.findMany({
+    select: { userId: true, pushToken: true },
   });
+  console.log('TOKENS:', usersWithToken);
 
-  for (const reminder of reminders) {
-    const replied = await userHasReplied(
-      reminder.discussionId,
-      reminder.userId
-    );
+  for (const { userId, pushToken } of usersWithToken) {
+    const courses = await getUserCourses(userId);
+    for (const course of courses) {
+      const forums = await fetchForums([course.id]);
 
-    if (replied) {
-      await prisma.forumReminder.update({
-        where: { id: reminder.id },
-        data: { replied: true },
-      });
-      continue;
+      const expiringForums = forums.filter(
+        f => f.duedate && f.duedate > now && f.duedate - now <= REMINDER_WINDOW
+      );
+
+      for (const forum of expiringForums) {
+        const discussionsResponse = await fetchForumDiscussions(forum.id);
+        const discussions = discussionsResponse.discussions || [];
+
+        for (const discussion of discussions) {
+          const status = await prisma.forumReplyStatus.findUnique({
+            where: {
+              userId_discussionId: {
+                userId,
+                discussionId: discussion.id,
+              },
+            },
+          });
+
+          if (status?.replied || status?.notified) {
+            console.log('Skip - ya respondido o notificado');
+            continue;
+          }
+
+          try {
+            await sendForumReminder(
+              userId,
+              'Foro por caducar',
+              `El foro "${forum.name}" está por cerrarse`
+            );
+
+            await prisma.forumReplyStatus.upsert({
+              where: {
+                userId_discussionId: {
+                  userId,
+                  discussionId: discussion.id,
+                },
+              },
+              update: { notified: true },
+              create: {
+                userId,
+                courseId: course.id,
+                forumId: forum.id,
+                discussionId: discussion.id,
+                replied: false,
+                notified: true,
+              },
+            });
+          } catch (err) {
+            console.error('Error enviando push o actualizando DB:', err);
+          }
+        }
+
+        if (discussions.length === 0) {
+          const status = await prisma.forumReplyStatus.findUnique({
+            where: {
+              userId_discussionId: {
+                userId,
+                discussionId: 0, 
+              },
+            },
+          });
+
+          if (!status?.notified) {
+            try {
+              await sendForumReminder(
+                userId,
+                'Foro por caducar',
+                `El foro "${forum.name}" está por cerrarse`
+              );
+
+              await prisma.forumReplyStatus.upsert({
+                where: {
+                  userId_discussionId: {
+                    userId,
+                    discussionId: 0,
+                  },
+                },
+                update: { notified: true },
+                create: {
+                  userId,
+                  courseId: course.id,
+                  forumId: forum.id,
+                  discussionId: 0,
+                  replied: false,
+                  notified: true,
+                },
+              });
+            } catch (err) {
+              console.error('Error enviando push o actualizando DB (foro sin discusión):', err);
+            }
+          }
+        }
+      }
     }
-
-    await sendForumReminder(
-      reminder.userId,
-      'Tienes una participación pendiente',
-      'Aún no has respondido en el foro'
-    );
-
-    await prisma.forumReminder.update({
-      where: { id: reminder.id },
-      data: { notified: true },
-    });
   }
 }
