@@ -36,8 +36,15 @@ export async function callMoodleApi({
     });
   }
 
-  if (response.data?.exception) {
+  /*if (response.data?.exception) {
     throw new Error(response.data.message);
+  }*/
+
+  if (response.data?.exception) {
+    const { message, errorcode, debuginfo } = response.data;
+    throw new Error(
+      `[${errorcode}] ${message}${debuginfo ? ` | ${debuginfo}` : ''}`
+    );
   }
 
   return response.data;

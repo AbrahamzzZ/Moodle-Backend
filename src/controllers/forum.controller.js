@@ -1,4 +1,3 @@
-import { MOODLE_TOKENS } from '../config/moodleTokens.js';
 import {
   fetchForums,
   fetchForumDiscussions,
