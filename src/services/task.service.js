@@ -5,21 +5,25 @@ import { callMoodleApi } from '../utils/moodleClient.js';
 import { MOODLE_TOKENS } from '../config/moodleTokens.js';
 
 export async function submitTaskText({ taskId, text }) {
-    return callMoodleApi({
-        token: MOODLE_TOKENS.admin,
-        wsfunction: 'mod_assign_save_submission',
-        method: 'POST',
-        params: {
-            assignmentid: Number(taskId),
-            plugindata: {
-                onlinetext_editor: {
-                    text: `<p>${text}</p>`,
-                    format: 1,
-                    itemid: 0
-                }
-            }
-        }
-    });
+  if (!taskId || !text) throw new Error('taskId y text son requeridos');
+
+  const moodleToken = MOODLE_TOKENS.admin;
+
+  return callMoodleApi({
+    token: moodleToken,
+    wsfunction: 'mod_assign_save_submission',
+    method: 'POST',
+    params: {
+      assignmentid: Number(taskId),
+      plugindata: {
+        onlinetext_editor: {
+          text: `<p>${text}</p>`,
+          format: 1,
+          itemid: 0,
+        },
+      },
+    },
+  });
 }
 
 export async function uploadTaskFile(filePath, fileName) {
@@ -32,12 +36,7 @@ export async function uploadTaskFile(filePath, fileName) {
     form.append('filename', fileName);
     form.append('file', fs.createReadStream(filePath));
 
-    const uploadUrl = process.env.MOODLE_URL
-        .replace('/webservice/rest/server.php', '/webservice/upload.php');
-
-    console.log('UPLOAD URL:', uploadUrl);
-    console.log('TOKEN USADO:', process.env.MOODLE_API_TOKEN);
-
+    const uploadUrl = process.env.MOODLE_URL.replace('/webservice/rest/server.php', '/webservice/upload.php');
     const response = await axios.post(
         uploadUrl,
         form,
@@ -48,8 +47,6 @@ export async function uploadTaskFile(filePath, fileName) {
         }
     );
 
-    console.log('RESPUESTA MOODLE UPLOAD:', response.data);
-
     if (!response.data || !response.data[0]?.itemid) {
         throw new Error('Error al subir archivo a Moodle: ' + JSON.stringify(response.data));
     }
@@ -59,22 +56,17 @@ export async function uploadTaskFile(filePath, fileName) {
 
 
 export async function submitTaskFile({ taskId, draftItemId}) {
-    console.log('SUBMIT FILE → taskId:', taskId);
-    console.log('SUBMIT FILE → draftItemId:', draftItemId);
-
     return callMoodleApi({
         token: process.env.MOODLE_API_TOKEN,
         wsfunction: 'mod_assign_save_submission',
         method: 'POST',
         params: {
             assignmentid: Number(taskId),
-        
             'plugindata[files_filemanager]': draftItemId
             },
         
     });
 }
-
 
 export async function submitTaskForGrading(taskId) {
     return callMoodleApi({
