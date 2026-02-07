@@ -6,31 +6,33 @@ import {
 } from '../services/task.service.js';
 
 export async function postTaskText(req, res) {
-    try {
-        const { taskId, text } = req.body;
-        const user = req.user; // viene del JWT
+  try {
+    const { taskId, text } = req.body;
+    const user = req.user;
 
-        if (!taskId || !text) {
-            return res.status(400).json({
-                ok: false,
-                message: 'taskId y text son requeridos',
-            });
-        }
-
-        const result = await submitTaskText({ taskId, text });
-
-        return res.json({
-            ok: true,
-            user,
-            submission: result,
-        });
-
-    } catch (error) {
-        return res.status(400).json({
-            ok: false,
-            message: error.message,
-        });
+    if (!taskId || !text) {
+      return res.status(400).json({
+        ok: false,
+        message: 'taskId y text son requeridos',
+      });
     }
+
+    const moodleToken = user.moodleToken; 
+    const result = await submitTaskText({ taskId, text });
+    console.log(result);
+
+    return res.json({
+      ok: true,
+      user,
+      submission: result,
+    });
+  } catch (error) {
+    console.error('postTaskText error:', error);
+    return res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
+  }
 }
 
 export async function postTaskFile(req, res) {
@@ -38,7 +40,7 @@ export async function postTaskFile(req, res) {
     try {
         const { taskId } = req.body;
         const file = req.file;
-        const user = req.user; // JWT
+        const user = req.user; 
 
         if (!taskId || !file) {
             return res.status(400).json({
