@@ -10,3 +10,7 @@ node_modules
 /src/generated/prisma
 
 /src/generated/prisma
+
+prisma/*.db
+prisma/*.db-journal
+uploads/
