@@ -29,3 +29,20 @@ model ForumReplyStatus {
 
   @@unique([userId, discussionId])
 }
+
+model ForumReminder {
+  id       Int      @id @default(autoincrement())
+  userId   Int
+  courseId Int
+  forumId  Int
+  sentAt   DateTime @default(now())
+
+  @@unique([userId, forumId])
+}
+
+model UserMoodleToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  token     String
+  updatedAt DateTime @updatedAt
+}
