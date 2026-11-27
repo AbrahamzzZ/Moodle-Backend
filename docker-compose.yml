@@ -1,0 +1,49 @@
+services:
+  moodle-db:
+    image: mariadb:10.11
+    container_name: moodle-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: moodle
+      MARIADB_USER: moodle
+      MARIADB_PASSWORD: moodle
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - moodle-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  moodle:
+    build:
+      context: .
+      dockerfile: docker/moodle/Dockerfile
+    container_name: moodle
+    restart: unless-stopped
+    depends_on:
+      moodle-db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      MOODLE_DB_HOST: moodle-db
+      MOODLE_DB_NAME: moodle
+      MOODLE_DB_USER: moodle
+      MOODLE_DB_PASS: moodle
+      # URL usada por los comandos de consola (en el navegador se usa la que escribas).
+      MOODLE_WWWROOT: http://localhost:8080
+      MOODLE_ADMIN_USER: admin
+      MOODLE_ADMIN_PASS: Admin123!
+      MOODLE_ADMIN_EMAIL: admin@example.com
+      MOODLE_SITE_NAME: Moodle Local
+    volumes:
+      - moodle-data:/var/www/moodledata
+
+volumes:
+  moodle-db-data:
+  moodle-data:

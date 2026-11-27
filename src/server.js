@@ -1,6 +1,9 @@
+import { env } from './config/env.js'; // primero: valida el .env antes de cargar lo demás
 import app from './app.js';
-import './config/jobs/cron.js'; 
+import { startJobs } from './jobs/index.js';
 
-app.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+app.listen(env.port, () => {
+  console.log(`Servidor corriendo en http://localhost:${env.port}`);
 });
+
+startJobs();
